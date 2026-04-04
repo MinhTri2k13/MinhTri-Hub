@@ -1,40 +1,27 @@
--- [[ MINH TRÍ HUB - BẢN QUYỀN RIÊNG CỦA MINH TRÍ ]]
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+-- [[ MINH TRÍ HUB - BẢN SIÊU NHẸ CHO PC ]]
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("Minh Trí Hub - PC Edition", "Midnight")
 
-local Window = Rayfield:CreateWindow({
-   Name = "Minh Trí Hub | Blox Fruits",
-   LoadingTitle = "Đang tải Minh Trí Hub...",
-   LoadingSubtitle = "by Minh Trí Gaming",
-   Theme = "Default" -- Có thể đổi thành 'Amber', 'Green', v.v.
-})
+-- Tab chính
+local Tab1 = Window:NewTab("Main Farm")
+local Section1 = Tab1:NewSection("Auto Farm Level")
 
-local MainTab = Window:CreateTab("Tự Động Farm", 4483362458) -- Icon farm
+Section1:NewButton("Bật Farm (Sắp có)", "Chức năng đang phát triển", function()
+    print("Minh Trí đang code...")
+end)
 
--- Nút bấm Test thử
-MainTab:CreateButton({
-   Name = "Bật Auto Farm Level (Sắp có)",
-   Callback = function()
-       print("Tính năng đang được Minh Trí phát triển!")
-       Rayfield:Notify({
-          Title = "Thông báo",
-          Content = "Mày đợi tao code xong tính năng này đã nhé!",
-          Duration = 5,
-          Image = 4483362458,
-       })
-   end,
-})
+-- Tab tiện ích (Dùng mấy cái lệnh đơn giản)
+local Tab2 = Window:NewTab("Tiện ích")
+local Section2 = Tab2:NewSection("Dành cho PC")
 
-local MiscTab = Window:CreateTab("Tiện ích", 4483362458)
+Section2:NewSlider("Tốc độ chạy (WalkSpeed)", "Chỉnh tốc độ nhân vật", 250, 16, function(s)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = s
+end)
 
-MiscTab:CreateButton({
-   Name = "Bay (Fly)",
-   Callback = function()
-       loadstring(game:HttpGet("https://raw.githubusercontent.com/Edgeiy/infiniteyield/master/source"))()
-   end,
-})
+Section2:NewButton("Bay (Infinite Yield)", "Dùng để phá game", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Edgeiy/infiniteyield/master/source"))()
+end)
 
-Rayfield:Notify({
-   Title = "Thành Công!",
-   Content = "Chào mừng mày đến với Minh Trí Hub!",
-   Duration = 5,
-})
+Section2:NewButton("Nhập Key Banana", "Dán Key của mày vào bảng gốc", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/obiiyeuem/vthangsitink/main/BF-BananaCat.lua"))()
+end)

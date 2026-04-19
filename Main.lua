@@ -1,3 +1,4 @@
+-- ⏳ đợi game load
 repeat task.wait() until game:IsLoaded()
 repeat task.wait() until game.Players.LocalPlayer.Character
 
@@ -7,10 +8,10 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 
 local running = true
 
--- 🎯 tìm target gần
+-- 🎯 tìm target gần nhất
 function GetTarget()
     local closest = nil
-    local dist = math.huge
+    local shortest = math.huge
 
     for _, v in pairs(Players:GetPlayers()) do
         if v ~= LocalPlayer
@@ -20,14 +21,16 @@ function GetTarget()
         and v.Character.Humanoid.Health > 0
         and v.Team ~= LocalPlayer.Team then
 
-            local myHRP = LocalPlayer.Character.HumanoidRootPart
-            local enemyHRP = v.Character.HumanoidRootPart
+            local myHRP = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            local enemyHRP = v.Character:FindFirstChild("HumanoidRootPart")
 
-            local d = (myHRP.Position - enemyHRP.Position).Magnitude
+            if myHRP and enemyHRP then
+                local dist = (myHRP.Position - enemyHRP.Position).Magnitude
 
-            if d < dist then
-                dist = d
-                closest = v
+                if dist < shortest then
+                    shortest = dist
+                    closest = v
+                end
             end
         end
     end
@@ -35,26 +38,44 @@ function GetTarget()
     return closest
 end
 
--- 🖱️ click
+-- 🍎 chỉ equip fruit (không lấy sword/gun)
+function EquipFruit()
+    local char = LocalPlayer.Character
+    local backpack = LocalPlayer.Backpack
+
+    for _, tool in pairs(backpack:GetChildren()) do
+        if tool:IsA("Tool") then
+            local name = tool.Name:lower()
+
+            if not string.find(name, "sword")
+            and not string.find(name, "gun") then
+                tool.Parent = char
+                return
+            end
+        end
+    end
+end
+
+-- 🖱️ spam click
 function Click()
     VirtualInputManager:SendMouseButtonEvent(0,0,0,true,game,0)
     VirtualInputManager:SendMouseButtonEvent(0,0,0,false,game,0)
 end
 
--- 🧠 di chuyển “nhẹ nhàng”
+-- 🚶 di chuyển nhẹ (anti ban)
 function MoveToTarget(targetHRP)
-    local myHRP = LocalPlayer.Character.HumanoidRootPart
+    local myHRP = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not myHRP then return end
 
-    -- chỉ di chuyển khi xa
     local distance = (myHRP.Position - targetHRP.Position).Magnitude
 
-    if distance > 10 then
-        -- dịch chuyển nhỏ (giống dash)
-        myHRP.CFrame = myHRP.CFrame:Lerp(targetHRP.CFrame, 0.1)
+    if distance > 8 then
+        -- di chuyển mượt (không teleport mạnh)
+        myHRP.CFrame = myHRP.CFrame:Lerp(targetHRP.CFrame * CFrame.new(0,0,4), 0.2)
     end
 end
 
--- 🔥 main
+-- 🔥 main loop
 task.spawn(function()
     while running do
         task.wait(0.2)
@@ -66,8 +87,9 @@ task.spawn(function()
                 local hrp = target.Character:FindFirstChild("HumanoidRootPart")
 
                 if hrp then
-                    MoveToTarget(hrp)
-                    Click()
+                    EquipFruit()      -- chỉ dùng fruit
+                    MoveToTarget(hrp) -- di chuyển an toàn
+                    Click()           -- spam attack
                 end
             end
         end)
